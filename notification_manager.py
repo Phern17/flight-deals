@@ -6,7 +6,6 @@ MAIL_PROVIDER_SMTP_ADDRESS = "smtp.gmail.com"
 MY_EMAIL = 'pooihern.birthday.service@gmail.com'
 
 
-
 class NotificationManager:
     # This class is responsible for sending notifications with the deal flight details.
     def __init__(self, account_sid, account_api, gmail_password):
