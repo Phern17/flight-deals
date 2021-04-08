@@ -5,6 +5,7 @@ from flight_data import FlightData
 
 TEQUILA_ENDPOINT = "https://tequila-api.kiwi.com"
 date_format = '%d/%m/%Y'
+ORIGIN_CITY_IATA = 'LON'
 
 
 class FlightSearch:
@@ -25,17 +26,17 @@ class FlightSearch:
         data = response.json()['locations'][0]['code']
         return data
 
-    def search_flights(self, destination_city_code, aim_price):
+    def search_flights(self, destination_city_code):
         tmr_date = dt.datetime.today() + dt.timedelta(days=1)
         max_date = dt.datetime.today() + dt.timedelta(days=180)
+        headers = {
+            'apikey': self.tequila_api
+        }
         parameters = {
-            'apikey': self.tequila_api,
-            'fly_from': 'LON',
+            'fly_from': ORIGIN_CITY_IATA,
             'fly_to': destination_city_code,
             'date_from': tmr_date.strftime(date_format),
             'date_to': max_date.strftime(date_format),
-            'price_to': aim_price,
-            'limit': 1,
             'max_stopovers': 0,
             'curr': 'GBP',
             'nights_in_dst_from': 7,
@@ -44,16 +45,42 @@ class FlightSearch:
             "one-for-city": 1
         }
 
-        response = requests.get(url=f'{TEQUILA_ENDPOINT}/v2/search', params=parameters)
+        response = requests.get(
+            url=f'{TEQUILA_ENDPOINT}/v2/search',
+            headers=headers,
+            params=parameters
+        )
         response.raise_for_status()
 
         try:
             data = response.json()['data'][0]
         except IndexError:
-            print(f"No flights found for {destination_city_code}.")
-            return None
+            parameters['max_stopovers'] = 1
+            response = requests.get(
+                url=f'{TEQUILA_ENDPOINT}/v2/search',
+                headers=headers,
+                params=parameters
+            )
+            response.raise_for_status()
+            print(response.json())
+            if len(response.json()['data']) > 0:
+                data = response.json()['data'][0]
 
-        flight_data_formatter = FlightData()
-        return flight_data_formatter.format_data(data)
+                flight_data = FlightData(price=data['price'], city_from=data['cityFrom'], fly_from=data['flyFrom'],
+                                         city_to=data['cityTo'], fly_to=data['flyTo'],
+                                         leave_date=data["route"][0]["local_departure"].split("T")[0],
+                                         return_date=data["route"][1]["local_departure"].split("T")[0],
+                                         stop_overs=1, via_city=data["route"][0]["cityTo"])
+                return flight_data
+            else:
+                return None
+
+        else:
+            flight_data = FlightData(price=data['price'], city_from=data['cityFrom'], fly_from=data['flyFrom'],
+                                     city_to=data['cityTo'], fly_to=data['flyTo'],
+                                     leave_date=data["route"][0]["local_departure"].split("T")[0],
+                                     return_date=data["route"][1]["local_departure"].split("T")[0],
+                                     )
+            return flight_data
 
 

@@ -1,14 +1,16 @@
 class FlightData:
     # This class is responsible for structuring the flight data.
-    def format_data(self, data):
-        price = data['price']
-        departure_city_name = data['cityFrom']
-        departure_airport_iata_code = data['flyFrom']
-        arrival_city_name = data['cityTo']
-        arrival_airport_iata_code = data['flyTo']
-        outbound_date = data["route"][0]["local_departure"].split("T")[0]
-        inbound_date = data["route"][1]["local_departure"].split("T")[0]
-        msg = f'Only £{price} to fly from {departure_city_name}-{departure_airport_iata_code} ' \
-              f'to {arrival_city_name}-{arrival_airport_iata_code}, from {outbound_date} to {inbound_date}'
+    def __init__(self, price, city_from, fly_from, city_to, fly_to,
+                 leave_date, return_date, stop_overs=0, via_city=""):
+        self.price = price
+        self.departure_city_name = city_from
+        self.departure_airport = fly_from
+        self.arrival_city_name = city_to
+        self.arrival_airport = fly_to
+        self.outbound_date = leave_date
+        self.inbound_date = return_date
+        self.stop_overs = stop_overs
+        self.via_city = via_city
 
-        return msg
+
+
