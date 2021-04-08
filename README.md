@@ -14,3 +14,12 @@ Environment Variable to set:
 - TWILIO_SID
 - TWILIO_API
 - TEQUILA_API
+
+
+# UPDATE 1.1
+
+## NOW U CAN ADD OTHER PPL EMAILS FOR THEM TO GET THE LATEST DEALS TOO
+
+👇Just key in your details in this program.👇
+
+https://replit.com/join/rgxddati-phern17 
